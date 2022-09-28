@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background: black;
+
+  @apply text-white;
+}
+
+.outer-grid {
+  grid-template-areas:
+    'zero hl hl hl hl hl hl hl'
+    'vl d d d d d d d'
+    'vl d d d d d d d'
+    'vl d d d d d d d'
+    'vl d d d d d d d'
+    'vl d d d d d d d'
+    'vl d d d d d d d';
+}
+
+.hl {
+  grid-area: hl;
+}
+
+.vl {
+  grid-area: vl;
+}
+
+.zero {
+  grid-area: zero;
+}
+
+.d {
+  grid-area: d;
+}
