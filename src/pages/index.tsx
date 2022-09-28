@@ -2,6 +2,8 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import { Header } from '../components/header';
+import { DownloadIcon } from '../components/icons/download';
+import { UploadIcon } from '../components/icons/upload';
 import { KnobGrid } from '../components/knob-grid';
 import { NoteSelector } from '../components/note-selector';
 import { PresetSelector } from '../components/preset-selector';
@@ -52,6 +54,18 @@ const Home: NextPage = () => {
             <NoteSelector></NoteSelector>
             <TempoSelector></TempoSelector>
             <TransportControls></TransportControls>
+
+            <div className='flex items-center p-4 mx-2 my-4 rounded-md bg-neutral-900'>
+              <a
+                href={
+                  'data:text/plain;charset=utf-8,' +
+                  encodeURIComponent(JSON.stringify(probData))
+                }
+              >
+                <DownloadIcon onClick={() => {}}></DownloadIcon>
+              </a>
+              <UploadIcon onClick={() => {}}></UploadIcon>
+            </div>
           </Header>
           <div className='flex items-center'>
             <KnobGrid probData={probData}></KnobGrid>

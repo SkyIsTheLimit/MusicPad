@@ -15,7 +15,7 @@ export function NoteSelector(props: {
   };
 
   return (
-    <div className='inline-flex px-8 py-0 m-4 rounded-md cursor-pointer bg-neutral-900'>
+    <div className='inline-flex px-8 py-0 mx-2 my-4 rounded-md cursor-pointer bg-neutral-900'>
       <HalfNote
         selected={selectedNote === 'half'}
         onClick={createNoteSelectedHandler('half')}
