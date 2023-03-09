@@ -1,0 +1,219 @@
+// import type { NextPage } from 'next';
+// import Head from 'next/head';
+// import { useEffect, useState } from 'react';
+// import { AppTitle } from '../components/AppTitle';
+// import { DownloadIcon, UploadIcon } from '../components/icons';
+// import { KnobGrid } from '../components/knob/knob-grid';
+// import { NoteSelector } from '../components/notes/note-selector';
+// import { PresetSelector } from '../components/preset-selector';
+// import { TempoSelector } from '../components/tempo-selector';
+// import { TransportControls } from '../components/transport-controls';
+
+// function* melodyGenerator(currentNote: number) {
+//   const probabilities: number[][] = yield;
+
+//   function getNextNote() {
+//     // console.log('In P');
+//     // console.log('P', probabilities);
+
+//     const currentNoteProbs = probabilities[currentNote];
+//     const sum = currentNoteProbs.reduceRight((acc, curr) => acc + curr, 0);
+//     const splits = currentNoteProbs.map((prob) =>
+//       Math.round((prob * 100) / sum)
+//     );
+//     const randomValue = Math.round(Math.random() * 100) % 100;
+
+//     const getIndex = (splits: number[]) => {
+//       let acc = 0;
+
+//       for (let i = 0; i < splits.length; i++) {
+//         acc += splits[i];
+
+//         if (acc > randomValue) {
+//           // console.log('Yielding', i, randomValue, splits);
+//           return i;
+//         }
+//       }
+//     };
+
+//     return getIndex(splits);
+//   }
+
+//   while (true) yield getNextNote();
+//   // yield -99;
+// }
+
+// const melody = melodyGenerator(0);
+
+// console.log('Generating Melody');
+// melody.next();
+// console.log(melody.next([[10, 23, 34, 0, 22, 11, 22]]).value);
+// console.log(melody.next([[10, 23, 34, 0, 22, 11, 22]]).value);
+// console.log(melody.next([[10, 23, 34, 0, 22, 11, 22]]).value);
+// console.log(melody.next([[10, 23, 34, 0, 22, 11, 22]]).value);
+
+// const Home: NextPage = () => {
+//   // console.log('Render');
+//   const [startingNote, setStartingNote] = useState(0);
+//   // const [currentNote, setCurrentNote] = useState(startingNote);
+//   // const [nextNote, setNextNote] = useState(-1);
+//   // const [gridData, setGridData] = useState([[]] as number[][]);
+//   const [probData, setProbData] = useState([
+//     [0, 0, 0, 0, 0, 0, 0],
+//     [0, 0, 0, 0, 0, 0, 0],
+//     [0, 0, 0, 0, 0, 0, 0],
+//     [0, 0, 0, 0, 0, 0, 0],
+//     [0, 0, 0, 0, 0, 0, 0],
+//     [0, 0, 0, 0, 0, 0, 0],
+//     [0, 0, 0, 0, 0, 0, 0],
+//   ]);
+//   const [midiAccess, setMidiAccess] = useState({} as WebMidi.MIDIAccess);
+//   const [midiDevice, setMidiDevice] = useState({} as WebMidi.MIDIInput);
+//   const [midiMessages, setMidiMessages] = useState([] as Uint8Array[]);
+//   const [noteLength, setNoteLength] = useState('quarter');
+//   const [currentTempo, setCurrentTempo] = useState(120);
+//   const [isShiftPressed, setIsShiftPressed] = useState(false);
+
+//   let melody: Generator<number | undefined, void, number[][]>;
+
+//   function processKnob(msg: Uint8Array) {
+//     const [status, channel, value] = msg;
+
+//     if (status === 176) {
+//       const newProbData: number[][] = [];
+//       for (let i = 0; i < probData.length; i++) {
+//         for (let k = 0; k < probData[i].length; k++) {
+//           newProbData[i] = newProbData[i] || [];
+//           newProbData[i][k] = probData[i][k];
+//         }
+//       }
+//       const value100 = Math.round((value * 100) / 127);
+//       newProbData[0][channel - 14] = value100;
+
+//       setProbData(newProbData);
+//     }
+//   }
+
+//   function processTouchStrip(msg: Uint8Array) {
+//     const [status, channel, value] = msg;
+
+//     if (isShiftPressed) {
+//       const scaledValue = Math.round((value / 127) * 240);
+
+//       setCurrentTempo(scaledValue);
+//     } else {
+//       const scaledValue = Math.round((value / 127) * 4);
+//       switch (scaledValue) {
+//         case 0:
+//           setNoteLength('half');
+//           break;
+
+//         case 1:
+//           setNoteLength('quarter');
+//           break;
+
+//         case 2:
+//           setNoteLength('eighth');
+//           break;
+
+//         case 3:
+//           setNoteLength('sixteenth');
+//           break;
+//       }
+//     }
+//   }
+
+//   useEffect(() => {
+//     if (navigator.requestMIDIAccess)
+//       navigator
+//         .requestMIDIAccess()
+//         .then((_midiAccess) => setMidiAccess(_midiAccess));
+
+//     document.body.onkeydown = (e) => setIsShiftPressed(e.shiftKey);
+//     document.body.onkeyup = (e) => setIsShiftPressed(e.shiftKey);
+
+//     melody = melodyGenerator(0);
+//   }, []);
+
+//   useEffect(() => {
+//     setInterval(() => {
+//       console.log('Next Note', melody.next(probData).value);
+//     }, 1000);
+//   }, [melody]);
+
+//   useEffect(() => {
+//     // console.log('Midi Access Received', midiAccess);
+
+//     if (midiAccess.inputs && midiAccess.inputs.size) {
+//       const midiDevice = midiAccess.inputs.entries().next().value[1];
+//       setMidiDevice(midiDevice);
+//     }
+//   }, [midiAccess]);
+
+//   useEffect(() => {
+//     // console.log('Recieved Midi Device', midiDevice);
+
+//     midiDevice.onmidimessage = (e) =>
+//       setMidiMessages([...midiMessages, e.data]);
+//   }, [midiDevice]);
+
+//   useEffect(() => {
+//     if (!midiMessages.length) return;
+
+//     const recentMsg = midiMessages[midiMessages.length - 1];
+//     // console.log(recentMsg);
+
+//     if (recentMsg[0] === 176) {
+//       if (recentMsg[1] === 1) {
+//         processTouchStrip(recentMsg);
+//       } else {
+//         processKnob(recentMsg);
+//       }
+//     } else {
+//       console.log('Undentified midi msg', recentMsg);
+//     }
+//   }, [midiMessages]);
+
+//   return (
+//     <>
+//       {' '}
+//       <Head>
+//         <title>Music Pad</title>
+//         <meta name='description' content='Generated by create next app' />
+//         <link rel='icon' href='/favicon.ico' />
+//       </Head>
+//       <div className='flex justify-center'>
+//         <div>
+//           <AppTitle>
+//             <NoteSelector selectedNote={noteLength}></NoteSelector>
+//             <TempoSelector tempo={currentTempo}></TempoSelector>
+//             <TransportControls></TransportControls>
+
+//             <div className='flex items-center p-4 mx-2 my-4 rounded-md bg-neutral-900'>
+//               <a
+//                 href={
+//                   'data:text/plain;charset=utf-8,' +
+//                   encodeURIComponent(JSON.stringify(probData))
+//                 }
+//               >
+//                 <DownloadIcon onClick={() => {}} />
+//               </a>
+//               <UploadIcon onClick={() => {}} />
+//             </div>
+//           </AppTitle>
+//           <div className='flex items-center'>
+//             <KnobGrid probData={probData}></KnobGrid>
+//           </div>
+//         </div>
+
+//         <PresetSelector
+//           onPresetSelected={(preset) => {
+//             setProbData(preset);
+//           }}
+//         ></PresetSelector>
+//       </div>
+//     </>
+//   );
+// };
+
+// export default Home;

@@ -1,11 +1,4 @@
-import {
-  MouseEvent as ReactMouseEvent,
-  UIEvent,
-  useEffect,
-  useRef,
-  useState,
-  WheelEvent,
-} from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   getPathDStringFunction,
   KnobOptions,
@@ -23,20 +16,58 @@ export default function Knob(props: KnobProps) {
   const [greenArcPathD, setGreenArcPathD] = useState('');
   const defaultOptions: KnobOptionsFull = {
     options: props,
-    radius: props.radius || 25,
+    radius: props.radius || 35,
     rotation: 0,
     t1: 90,
   };
+  const knobDiv = useRef<HTMLDivElement>(null);
 
   const [isMouseDown, setMouseDown] = useState(false);
 
   const redArcD = getPathDStringFunction(defaultOptions);
   const greenArcD = getPathDStringFunction({
     ...defaultOptions,
-    radius: defaultOptions.radius * 0.8,
+    radius: defaultOptions.radius * 1.0,
     cx: defaultOptions.radius,
     cy: defaultOptions.radius,
   });
+
+  useEffect(() => {
+    function updateKnobValue(newValue: number) {
+      if (newValue >= props.min && newValue <= props.max) {
+        setValue(newValue);
+        if (props.onValueChanged) props.onValueChanged(newValue);
+      }
+    }
+
+    let maxSpeed = 1;
+
+    setInterval(() => (maxSpeed = 0), 300);
+
+    knobDiv.current?.addEventListener(
+      'wheel',
+      function onWheel(e: any) {
+        // console.log('Wheel', e, value);
+        e.stopPropagation();
+        e.preventDefault();
+
+        if (Math.abs(e.deltaY) > maxSpeed) {
+          maxSpeed = Math.abs(e.deltaY) || 1;
+        }
+
+        const speed = (e.deltaY / maxSpeed) * 2;
+
+        // if (e.deltaY > 0) {
+        updateKnobValue(Math.round(value + speed));
+        // } else {
+        // updateKnobValue(value - speed);
+        // }
+
+        return false;
+      },
+      { passive: false }
+    );
+  }, [props, value]);
 
   useEffect(() => {
     setValue(props.value);
@@ -47,25 +78,18 @@ export default function Knob(props: KnobProps) {
     setGreenArcPathD(greenArcD(359 * (value / props.max)));
   }, [knobData, redArcD, greenArcD, props, value]);
 
-  function updateKnobValue(newValue: number) {
-    if (newValue >= props.min && newValue <= props.max) {
-      setValue(newValue);
-      if (props.onValueChanged) props.onValueChanged(newValue);
-    }
-  }
-
-  function captureWheel(e: WheelEvent) {
-    if (e.deltaY > 0) {
-      updateKnobValue(value + 1);
-    } else {
-      updateKnobValue(value - 1);
-    }
+  function performDrag(e: any) {
+    console.log('Perfrom Drag', e);
   }
 
   return (
     <div
-      className='relative items-center justify-center inline-block text-center rounded-full cursor-pointer w-fit bg-neutral-800'
-      onWheel={captureWheel}
+      className='relative items-center justify-center inline-block text-center rounded-full cursor-pointer w-fit bg-[#111] opacity-50 hover:opacity-100'
+      // onWheel={captureWheel}
+      onDragEnter={performDrag}
+      onDrag={performDrag}
+      onDragExit={performDrag}
+      ref={knobDiv}
     >
       <svg
         width={defaultOptions.radius * 2}
@@ -80,7 +104,7 @@ export default function Knob(props: KnobProps) {
           />
 
           <path
-            className='fill-transparent stroke-green-400'
+            className='fill-transparent stroke-[#7EFF69]'
             strokeWidth={defaultOptions.radius * 0.2}
             d={greenArcPathD}
           />

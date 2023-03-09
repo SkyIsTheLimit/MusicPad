@@ -66,7 +66,7 @@ export function KnobGrid(props: {
   );
 
   return (
-    <div className='inline-grid grid-cols-8 mx-auto outer-grid grid-rows-[8] bg-neutral-900 pr-8 pb-8 rounded-md mt-4'>
+    <div className='inline-grid grid-cols-8 mx-auto outer-grid grid-rows-[8] pr-8 pb-8 rounded-md mt-4'>
       <div className='zero'></div>
       <div className='flex my-8 hl'>{horizontalScaleLabels}</div>
       <div className='flex flex-col vl'> {verticalScaleLabels}</div>
