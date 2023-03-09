@@ -72,7 +72,7 @@ export function ProjectBar() {
     ]);
 
   return (
-    <div className='fixed bottom-0 flex justify-between w-full px-4 py-2 bg-[#222]'>
+    <div className='fixed z-10 bottom-0 flex justify-between w-full px-4 py-2 bg-[#222]'>
       <div className='flex items-center gap-8'>
         <div className='flex items-center gap-2'>
           <Edit className='w-6' />
