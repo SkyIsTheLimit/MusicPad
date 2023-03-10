@@ -1,3 +1,4 @@
+import { HTMLAttributes } from 'react';
 import { useProjectContext } from './context/project';
 import { useToneContext } from './context/tone';
 import {
@@ -12,9 +13,10 @@ import {
 } from './context/utils';
 import { Edit, List, Play, Share, Stop } from './icons';
 
-export function ProjectBar() {
+export function TransportControls({
+  className,
+}: HTMLAttributes<HTMLDivElement>) {
   const {
-    name,
     tempo,
     setTempo,
     keySignature,
@@ -22,8 +24,6 @@ export function ProjectBar() {
     timeSignature,
     setTimeSignature,
   } = useProjectContext();
-  const { transportState, toggleTransport } = useToneContext();
-
   const incrementTempo = () => setTempo((tempo) => tempo + 1);
   const decrementTempo = () => setTempo((tempo) => tempo - 1);
 
@@ -72,105 +72,118 @@ export function ProjectBar() {
     ]);
 
   return (
-    <div className='fixed z-10 bottom-0 flex justify-between w-full px-4 py-2 bg-[#222]'>
-      <div className='flex items-center gap-8'>
+    <div className={`flex items-start justify-between ${className}`}>
+      <div className='flex flex-col-reverse items-center md:mx-4'>
+        <span className='inline-block text-xs font-bold text-center uppercase text-neutral-400'>
+          Tempo
+        </span>
         <div className='flex items-center gap-2'>
-          <Edit className='w-6' />
-          <span>{name}</span>
-          {transportState === 'stopped' && (
-            <button onClick={toggleTransport}>
-              <Play className='w-8' />
+          <span className='inline-block w-[2rem] text-right'>{tempo}</span>
+          <span>BPM</span>
+          <div className='flex flex-col'>
+            <button onClick={incrementTempo} className='text-xs'>
+              &#9650;
             </button>
-          )}
-          {transportState === 'started' && (
-            <button onClick={toggleTransport}>
-              <Stop className='w-8' />
+            <button onClick={decrementTempo} className='text-xs'>
+              &#9660;
             </button>
-          )}
-        </div>
-
-        <div className='flex gap-2'>
-          <Share className='w-6' />
-          <List className='w-6' />
+          </div>
         </div>
       </div>
 
-      <div className='flex'>
-        <div className='flex flex-col-reverse items-center mx-4'>
-          <span className='inline-block text-xs font-bold text-center uppercase text-neutral-400'>
-            Tempo
-          </span>
-          <div className='flex items-center gap-2'>
-            <span className='inline-block w-[2rem] text-right'>{tempo}</span>
-            <span>BPM</span>
-            <div className='flex flex-col'>
-              <button onClick={incrementTempo} className='text-xs'>
-                &#9650;
-              </button>
-              <button onClick={decrementTempo} className='text-xs'>
-                &#9660;
-              </button>
-            </div>
+      {/* <div className='w-1 h-full mx-2 border-r-[0.0625em] border-neutral-600'></div> */}
+
+      <div className='flex flex-col-reverse items-center md:mx-4'>
+        <span className='inline-block text-xs font-bold text-center uppercase text-neutral-400'>
+          Key Signature
+        </span>
+        <div className='flex items-center gap-2'>
+          <span className='inline-block w-[0.5rem]'>{keySignature.root}</span>
+          <div className='flex flex-col'>
+            <button onClick={incrementRoot} className='text-xs'>
+              &#9650;
+            </button>
+            <button onClick={decrementRoot} className='text-xs'>
+              &#9660;
+            </button>
           </div>
-        </div>
-
-        <div className='w-1 h-full mx-2 border-r-[0.0625em] border-neutral-600'></div>
-
-        <div className='flex flex-col-reverse items-center mx-4'>
-          <span className='inline-block text-xs font-bold text-center uppercase text-neutral-400'>
-            Key Signature
-          </span>
-          <div className='flex items-center gap-2'>
-            <span className='inline-block w-[0.5rem]'>{keySignature.root}</span>
-            <div className='flex flex-col'>
-              <button onClick={incrementRoot} className='text-xs'>
-                &#9650;
-              </button>
-              <button onClick={decrementRoot} className='text-xs'>
-                &#9660;
-              </button>
-            </div>
-            <span>{keySignature.mode}</span>
-            <div className='flex flex-col'>
-              <button onClick={incrementMode} className='text-xs'>
-                &#9650;
-              </button>
-              <button onClick={decrementMode} className='text-xs'>
-                &#9660;
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className='w-1 h-full mx-2 border-r-[0.0625em] border-neutral-600'></div>
-
-        <div className='flex flex-col-reverse items-center mx-4'>
-          <span className='inline-block text-xs font-bold text-center uppercase text-neutral-400'>
-            Time Signature
-          </span>
-          <div className='flex items-center gap-2 text-sm font-bold'>
-            <div className='flex flex-col'>
-              <button onClick={incrementNumerator} className='text-xs'>
-                &#9650;
-              </button>
-              <button onClick={decrementNumerator} className='text-xs'>
-                &#9660;
-              </button>
-            </div>
-            <span className='inline-block w-[0.5rem]'>{timeSignature[0]}</span>
-            <span>/</span>
-            <span>{timeSignature[1]}</span>
-            <div className='flex flex-col'>
-              <button onClick={incrementDenominator} className='text-xs'>
-                &#9650;
-              </button>
-              <button onClick={decrementDenominator} className='text-xs'>
-                &#9660;
-              </button>
-            </div>
+          <span>{keySignature.mode}</span>
+          <div className='flex flex-col'>
+            <button onClick={incrementMode} className='text-xs'>
+              &#9650;
+            </button>
+            <button onClick={decrementMode} className='text-xs'>
+              &#9660;
+            </button>
           </div>
         </div>
       </div>
+
+      {/* <div className='w-1 h-full mx-2 border-r-[0.0625em] border-neutral-600'></div> */}
+
+      <div className='flex flex-col-reverse items-center md:ml-4'>
+        <span className='inline-block text-xs font-bold text-center uppercase text-neutral-400'>
+          Time Signature
+        </span>
+        <div className='flex items-center gap-2 text-sm font-bold'>
+          <div className='flex flex-col'>
+            <button onClick={incrementNumerator} className='text-xs'>
+              &#9650;
+            </button>
+            <button onClick={decrementNumerator} className='text-xs'>
+              &#9660;
+            </button>
+          </div>
+          <span className='inline-block w-[0.5rem]'>{timeSignature[0]}</span>
+          <span>/</span>
+          <span>{timeSignature[1]}</span>
+          <div className='flex flex-col'>
+            <button onClick={incrementDenominator} className='text-xs'>
+              &#9650;
+            </button>
+            <button onClick={decrementDenominator} className='text-xs'>
+              &#9660;
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function ProjectInfo() {
+  const { name } = useProjectContext();
+  const { transportState, toggleTransport } = useToneContext();
+
+  return (
+    <div className='flex items-center justify-between flex-1 gap-8 py-8 md:py-0 md:justify-start'>
+      <div className='flex items-center gap-2'>
+        <Edit className='w-6' />
+        <span>{name}</span>
+        {transportState === 'stopped' && (
+          <button onClick={toggleTransport}>
+            <Play className='w-8' />
+          </button>
+        )}
+        {transportState === 'started' && (
+          <button onClick={toggleTransport}>
+            <Stop className='w-8' />
+          </button>
+        )}
+      </div>
+
+      <div className='flex gap-2'>
+        <Share className='w-6' />
+        <List className='w-6' />
+      </div>
+    </div>
+  );
+}
+
+export function ProjectBar({ children }: HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div className='fixed z-10 bottom-0 flex flex-col md:flex-row w-full px-4 py-2 bg-[#222]'>
+      {children}
     </div>
   );
 }

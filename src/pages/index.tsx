@@ -1,6 +1,10 @@
 import { NextPage } from 'next';
 import { useEffect, useState } from 'react';
-import { ProjectBar } from '../components/ProjectBar';
+import {
+  ProjectBar,
+  ProjectInfo,
+  TransportControls,
+} from '../components/ProjectBar';
 import { Transport } from 'tone';
 import { ContextStarter } from '../components/ContextStarter';
 import { SequenceEditor } from '../components/SequenceEditor';
@@ -76,7 +80,11 @@ const IndexPage: NextPage = () => {
 
   return (
     <>
-      <ProjectBar />
+      <ProjectBar>
+        <ProjectInfo />
+        <TransportControls />
+      </ProjectBar>
+
       <ContextStarter />
       <AppTitle />
 
