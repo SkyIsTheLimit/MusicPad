@@ -211,14 +211,14 @@ export function ProjectInfo({
         {!opened ? (
           <button
             onClick={open}
-            className='rounded-md text-neutral-400 bg-[#111] w-8 h-8 flex items-center justify-center'
+            className='rounded-md md:hidden text-neutral-400 bg-[#111] w-8 h-8 flex items-center justify-center'
           >
             <ChevronUp className='w-5' />
           </button>
         ) : (
           <button
             onClick={close}
-            className='rounded-md text-neutral-400 bg-[#111] w-8 h-8 flex items-center justify-center'
+            className='rounded-md md:hidden text-neutral-400 bg-[#111] w-8 h-8 flex items-center justify-center'
           >
             <ChevronDown className='w-5' />
           </button>
