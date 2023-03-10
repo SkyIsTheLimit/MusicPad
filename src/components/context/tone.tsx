@@ -1,6 +1,6 @@
 import { createContext, HTMLAttributes, useContext, useState } from 'react';
 import { Transport, PlaybackState } from 'tone';
-import { TimeSignature } from './utils';
+import { TimeSignature } from '../utils';
 
 export interface ToneContext {
   isStarted: boolean;

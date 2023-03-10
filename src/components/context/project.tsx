@@ -9,7 +9,7 @@ import {
 } from 'react';
 import { Transport } from 'tone';
 import { useToneContext } from './tone';
-import { KeySignature, TimeSignature } from './utils';
+import { KeySignature, TimeSignature } from '../utils';
 
 export interface ProjectContext {
   name: string;

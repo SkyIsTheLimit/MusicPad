@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { getPath } from './circle-arc';
+import { getPath } from './utils';
 
 export interface KnobParams {
   min?: number;

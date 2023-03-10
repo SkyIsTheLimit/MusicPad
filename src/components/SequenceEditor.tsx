@@ -1,5 +1,5 @@
 import { HTMLAttributes, useEffect, useState } from 'react';
-import { TimeSignature } from './context/utils';
+import { TimeSignature } from './utils';
 
 export interface SequencerEditorCellProps
   extends HTMLAttributes<HTMLDivElement> {

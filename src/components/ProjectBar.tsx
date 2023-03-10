@@ -10,7 +10,7 @@ import {
   getPreviousRootNote,
   getPreviousTimeSignatureDenominator,
   getPreviousTimeSignatureNumerator,
-} from './context/utils';
+} from './utils';
 import { Edit, List, Play, Share, Stop } from './icons';
 
 export function TransportControls({

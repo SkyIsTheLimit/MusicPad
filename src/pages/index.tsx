@@ -12,9 +12,9 @@ import { useToneContext } from '../components/context/tone';
 import { LEDBar } from '../components/LEDBar';
 import { useProjectContext } from '../components/context/project';
 import { AppTitle } from '../components/AppTitle';
-import { splitArray } from '../components/context/utils';
+import { splitArray } from '../components/utils';
 import { KnobContainer, KnobGrid } from '../components/knob/KnobGrid';
-import { PresetSelector } from '../components/preset-selector';
+import { PresetSelector } from '../components/PresetSelector';
 
 const IndexPage: NextPage = () => {
   const [probData, setProbData] = useState([

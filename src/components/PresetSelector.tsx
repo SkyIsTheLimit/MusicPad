@@ -8,9 +8,11 @@ function createRandomPreset() {
     ]);
 }
 
-export function PresetSelector(props: {
+export interface PresetSelectorProps {
   onPresetSelected: (preset: number[][]) => void;
-}) {
+}
+
+export function PresetSelector({ onPresetSelected }: PresetSelectorProps) {
   const [presets, setPresets] = useState([
     createRandomPreset(),
     createRandomPreset(),
@@ -25,8 +27,8 @@ export function PresetSelector(props: {
   const [selectedPreset, setSelectedPreset] = useState(presets[0]);
 
   useEffect(() => {
-    if (props.onPresetSelected) props.onPresetSelected(selectedPreset);
-  }, []);
+    onPresetSelected(selectedPreset);
+  }, [onPresetSelected, selectedPreset]);
 
   return (
     <div className='p-4 mt-8 ml-8 rounded-md bg-neutral-900'>
@@ -43,7 +45,7 @@ export function PresetSelector(props: {
           }`}
           onClick={() => {
             setSelectedPreset(preset);
-            props.onPresetSelected(preset);
+            onPresetSelected(preset);
           }}
         >
           <span>Preset {index}</span>
