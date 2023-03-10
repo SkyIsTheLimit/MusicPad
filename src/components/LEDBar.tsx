@@ -1,19 +1,23 @@
 export interface LEDProps {
-  state: 'on' | 'off';
+  state: 'on' | 'off' | 'visited';
   color: 'blue' | 'green';
 }
 
 export function LED({ state, color }: LEDProps) {
   const bg =
-    state === 'off' ? '#111' : color === 'blue' ? '#73DDFF' : '#7EFF69';
+    state === 'off' || state === 'visited'
+      ? '#111'
+      : color === 'blue'
+      ? '#73FFFF'
+      : '#7EFF69';
 
   return (
     <div
       style={{
         backgroundColor: bg,
       }}
-      className={`${
-        state === 'on' && 'blur-[0.05em]'
+      className={`${state === 'on' && 'blur-[0.125em]'} ${
+        state === 'visited' && 'border-[#73FFFF]/100 blur-[0.75px] border-[1px]'
       } mx-auto rounded-full w-[0.6rem] h-[0.6rem]`}
     ></div>
   );
@@ -34,7 +38,9 @@ export function LEDBar({ ledCount, activeLed }: LEDBarProps) {
         <LED
           key={index}
           color='blue'
-          state={activeLed === index ? 'on' : 'off'}
+          state={
+            activeLed === index ? 'on' : index < activeLed ? 'visited' : 'off'
+          }
         />
       ))}
     </div>
