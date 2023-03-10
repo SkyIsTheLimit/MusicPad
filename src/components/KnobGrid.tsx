@@ -62,7 +62,7 @@ export function KnobGrid({
     }
   }
 
-  useEffect(() => handleKnobSizes, [divRef]);
+  useEffect(() => handleKnobSizes(), [divRef]);
 
   useEffect(() => {
     window.addEventListener('resize', handleKnobSizes);
