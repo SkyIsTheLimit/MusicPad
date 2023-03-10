@@ -12,7 +12,7 @@ export function SequencerEditorCell({
 }: SequencerEditorCellProps) {
   return (
     <div
-      className={`min-w-[0.5em] w-[50%] mx-auto max-w-[1.5em] h-8 cursor-pointer ${className}`}
+      className={`min-w-[0.5em] w-[75%] md:w-[50%] mx-auto max-w-[1.5em] h-3 md:h-5 2xl:h-8 cursor-pointer ${className}`}
       onClick={() => {
         if (onToggle) onToggle();
       }}
@@ -28,12 +28,7 @@ export interface MeasureProps {
   onToggle?: (index: number) => void;
 }
 
-export function Measure({
-  timeSignature,
-  pattern,
-  invert,
-  onToggle,
-}: MeasureProps) {
+export function Measure({ timeSignature, pattern, onToggle }: MeasureProps) {
   function toggle(index: number) {
     return () => {
       if (onToggle) {
@@ -44,7 +39,7 @@ export function Measure({
 
   return (
     <div
-      className='grid gap-2 py-2 bg-[#000] rounded-md'
+      className='grid gap-1 md:gap-0 py-2 bg-[#000] rounded-md'
       style={{
         gridTemplateColumns: `repeat(${timeSignature[0]}, minmax(0, 1fr)`,
       }}
@@ -85,7 +80,6 @@ export function SequenceEditor({
       {new Array(measureCount).fill(-1).map((_, index) => (
         <Measure
           key={index}
-          invert={index % 2 !== 0}
           {...{ timeSignature }}
           pattern={pattern[index]}
           onToggle={(innerIndex) => {
