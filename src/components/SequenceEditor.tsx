@@ -1,4 +1,4 @@
-import { HTMLAttributes, useEffect, useState } from 'react';
+import { HTMLAttributes } from 'react';
 import { TimeSignature } from './utils';
 
 export interface SequencerEditorCellProps

@@ -4,17 +4,16 @@ import {
   ProjectBar,
   ProjectInfo,
   TransportControls,
-} from '../components/ProjectBar';
+} from '@/components/ProjectBar';
 import { Transport } from 'tone';
-import { ContextStarter } from '../components/ContextStarter';
-import { SequenceEditor } from '../components/SequenceEditor';
-import { useToneContext } from '../components/context/tone';
-import { LEDBar } from '../components/LEDBar';
-import { useProjectContext } from '../components/context/project';
-import { AppTitle } from '../components/AppTitle';
-import { splitArray } from '../components/utils';
-import { KnobContainer, KnobGrid } from '../components/knob/KnobGrid';
-import { PresetSelector } from '../components/PresetSelector';
+import { ContextStarter } from '@/components/ContextStarter';
+import { SequenceEditor } from '@/components/SequenceEditor';
+import { useToneContext } from '@/components/context/tone';
+import { LEDBar } from '@/components/LEDBar';
+import { useProjectContext } from '@/components/context/project';
+import { AppTitle } from '@/components/AppTitle';
+import { splitArray } from '@/components/utils';
+import { KnobContainer, KnobGrid } from '@/components/KnobGrid';
 
 const IndexPage: NextPage = () => {
   const [probData, setProbData] = useState([
