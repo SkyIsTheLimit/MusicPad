@@ -45,36 +45,14 @@ export function calculateArc(
   );
 }
 
-export interface KnobOptionsFull {
-  options: KnobOptions;
-  radius: number;
-  cx?: number;
-  cy?: number;
-  t1: number;
-  rotation?: number;
-}
-
-export interface KnobOptions {
-  isContinuous: boolean;
-  radius?: number;
-
-  min: number;
-  max: number;
-
-  value: number;
-}
-
 export const toRads = (angle: number) => (angle / 180) * Math.PI;
 
-export function getPathDStringFunction(fullOptions: KnobOptionsFull) {
+export function getPath(radius: number) {
   return (value: number) =>
     calculateArc(
-      [
-        fullOptions.cx || fullOptions.radius,
-        fullOptions.cy || fullOptions.radius,
-      ],
-      [fullOptions.radius * 0.86, fullOptions.radius * 0.86],
-      [toRads(fullOptions.t1), toRads(value)],
-      fullOptions.rotation || 0
+      [radius, radius],
+      [radius * 0.86, radius * 0.86],
+      [toRads(90), toRads(value)],
+      0
     );
 }

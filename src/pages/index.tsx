@@ -1,7 +1,6 @@
 import { NextPage } from 'next';
 import { useEffect, useState } from 'react';
 import { ProjectBar } from '../components/ProjectBar';
-import { KnobGrid } from '../components/knob/knob-grid';
 import { Transport } from 'tone';
 import { ContextStarter } from '../components/ContextStarter';
 import { SequenceEditor } from '../components/SequenceEditor';
@@ -10,9 +9,10 @@ import { LEDBar } from '../components/LEDBar';
 import { useProjectContext } from '../components/context/project';
 import { AppTitle } from '../components/AppTitle';
 import { splitArray } from '../components/context/utils';
+import { KnobContainer, KnobGrid } from '../components/knob/KnobGrid';
 import { PresetSelector } from '../components/preset-selector';
 
-const M: NextPage = () => {
+const IndexPage: NextPage = () => {
   const [probData, setProbData] = useState([
     [0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0],
@@ -80,9 +80,9 @@ const M: NextPage = () => {
       <ContextStarter />
       <AppTitle />
 
-      <div className='flex justify-center'>
+      <div className='flex justify-center mb-24'>
         <div className='flex flex-col p-4'>
-          <div className='flex flex-col px-3 py-2 m-4 rounded-lg bg-[#060606]'>
+          <div className='flex flex-col px-3 py-2 mb-4 rounded-lg bg-[#060606]'>
             <SequenceEditor
               measureCount={measureCount}
               timeSignature={timeSignature}
@@ -96,19 +96,61 @@ const M: NextPage = () => {
             />
           </div>
 
-          <div className='rounded-lg bg-[#060606] p-4 mx-4'>
-            <KnobGrid probData={probData} />
-          </div>
+          <KnobContainer className='bg-[#060606] rounded-lg relative'>
+            <KnobGrid
+              className='max-w-[720px] max-h-[720px] w-[80vw] h-[80vw] md:w-[50vw] md:h-[50vw]'
+              values={probData}
+              rows={8}
+              columns={8}
+              gridTemplateAreas={`'zero hl hl hl hl hl hl hl'
+              'vl d d d d d d d'
+              'vl d d d d d d d'
+              'vl d d d d d d d'
+              'vl d d d d d d d'
+              'vl d d d d d d d'
+              'vl d d d d d d d'
+              'vl d d d d d d d'`}
+              horizontalLabels={
+                <div
+                  className='flex items-end justify-center pb-2'
+                  style={{ gridArea: 'hl' }}
+                >
+                  {['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii'].map(
+                    (label, index) => (
+                      <span
+                        className='flex-1 inline-block text-xs text-center text-neutral-500'
+                        key={index}
+                      >
+                        {label}
+                      </span>
+                    )
+                  )}
+                </div>
+              }
+              verticalLabels={
+                <div
+                  className='flex flex-col items-end justify-center pr-2'
+                  style={{ gridArea: 'vl' }}
+                >
+                  {['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii'].map(
+                    (label, index) => (
+                      <div className='flex items-center flex-1' key={index}>
+                        <span className='inline-block text-xs text-center text-neutral-500'>
+                          {label}
+                        </span>
+                      </div>
+                    )
+                  )}
+                </div>
+              }
+            >
+              <div style={{ gridArea: 'zero' }}></div>
+            </KnobGrid>
+          </KnobContainer>
         </div>
-
-        {/* <PresetSelector
-          onPresetSelected={(preset) => {
-            setProbData(preset);
-          }}
-        ></PresetSelector> */}
       </div>
     </>
   );
 };
 
-export default M;
+export default IndexPage;

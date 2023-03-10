@@ -1,118 +1,133 @@
 import { useEffect, useRef, useState } from 'react';
-import {
-  getPathDStringFunction,
-  KnobOptions,
-  KnobOptionsFull,
-} from './circle-arc';
+import { getPath } from './circle-arc';
 
-export interface KnobProps extends KnobOptions {
-  onValueChanged?: (newValue: number) => void;
+export interface KnobParams {
+  min?: number;
+  max?: number;
+  value: number;
+  radius?: number;
 }
 
-export default function Knob(props: KnobProps) {
-  const [value, setValue] = useState(props.value);
-  const [knobData, setKnobData] = useState({ ...props });
-  const [redArcPathD, setRedArcPathD] = useState('');
-  const [greenArcPathD, setGreenArcPathD] = useState('');
-  const defaultOptions: KnobOptionsFull = {
-    options: props,
-    radius: props.radius || 35,
-    rotation: 0,
-    t1: 90,
-  };
-  const knobDiv = useRef<HTMLDivElement>(null);
+export interface Touchable {
+  showOverlay: () => void;
+  hideOverlay: () => void;
+}
 
-  const [isMouseDown, setMouseDown] = useState(false);
-
-  const redArcD = getPathDStringFunction(defaultOptions);
-  const greenArcD = getPathDStringFunction({
-    ...defaultOptions,
-    radius: defaultOptions.radius * 1.0,
-    cx: defaultOptions.radius,
-    cy: defaultOptions.radius,
-  });
+export function Knob({
+  min,
+  max,
+  value: value_,
+  radius,
+  showOverlay,
+  hideOverlay,
+}: KnobParams & Touchable) {
+  const divRef = useRef<HTMLDivElement>(null);
+  const [path, setPath] = useState('');
+  const [value, setValue] = useState(value_ || 0);
+  const [touchStarted, setTouchStarted] = useState(-1);
 
   useEffect(() => {
+    const divRefCopy = divRef;
+    let maxSpeed = 1;
+
     function updateKnobValue(newValue: number) {
-      if (newValue >= props.min && newValue <= props.max) {
+      const minLimit = min || 0;
+      const maxLimit = max || 100;
+
+      if (newValue >= minLimit && newValue <= maxLimit) {
         setValue(newValue);
-        if (props.onValueChanged) props.onValueChanged(newValue);
       }
     }
 
-    let maxSpeed = 1;
+    function handleWheel(e: WheelEvent) {
+      e.stopPropagation();
+      e.preventDefault();
 
-    setInterval(() => (maxSpeed = 0), 300);
+      if (Math.abs(e.deltaY) > maxSpeed) {
+        maxSpeed = Math.abs(e.deltaY) || 1;
+      }
 
-    knobDiv.current?.addEventListener(
-      'wheel',
-      function onWheel(e: any) {
-        // console.log('Wheel', e, value);
-        e.stopPropagation();
-        e.preventDefault();
+      const speed = (e.deltaY / maxSpeed) * 2;
 
-        if (Math.abs(e.deltaY) > maxSpeed) {
-          maxSpeed = Math.abs(e.deltaY) || 1;
-        }
+      updateKnobValue(Math.round(value + speed));
 
-        const speed = (e.deltaY / maxSpeed) * 2;
+      return false;
+    }
 
-        // if (e.deltaY > 0) {
-        updateKnobValue(Math.round(value + speed));
-        // } else {
-        // updateKnobValue(value - speed);
-        // }
+    function touchStart(e: TouchEvent) {
+      e.preventDefault();
+      e.stopPropagation();
+      setTouchStarted(e.touches[0].clientY);
+      showOverlay();
+    }
 
-        return false;
-      },
-      { passive: false }
-    );
-  }, [props, value]);
+    function touchMove(e: TouchEvent) {
+      if (touchStarted !== -1) {
+        const diff = touchStarted - e.changedTouches[0].clientY;
+
+        updateKnobValue(Math.round(value + diff));
+
+        setTouchStarted(e.changedTouches[0].clientY);
+      }
+    }
+
+    function touchEnd(e: TouchEvent) {
+      setTouchStarted(-1);
+      hideOverlay();
+    }
+
+    if (divRefCopy && divRefCopy.current) {
+      divRefCopy.current.addEventListener('wheel', handleWheel, {
+        passive: false,
+      });
+
+      divRefCopy.current.addEventListener('touchstart', touchStart);
+      divRefCopy.current.addEventListener('touchmove', touchMove);
+      divRefCopy.current.addEventListener('touchend', touchEnd);
+    }
+
+    return () => {
+      if (divRefCopy && divRefCopy.current) {
+        divRefCopy.current.removeEventListener('wheel', handleWheel);
+        divRefCopy.current.removeEventListener('touchstart', touchStart);
+        divRefCopy.current.removeEventListener('touchmove', touchMove);
+        divRefCopy.current.removeEventListener('touchend', touchEnd);
+      }
+    };
+  }, [divRef, min, max, value, showOverlay, hideOverlay, touchStarted]);
 
   useEffect(() => {
-    setValue(props.value);
-  }, [props]);
-
-  useEffect(() => {
-    // setRedArcPathD(redArcD(359 * (value / props.max)));
-    setGreenArcPathD(greenArcD(359 * (value / props.max)));
-  }, [knobData, redArcD, greenArcD, props, value]);
-
-  function performDrag(e: any) {
-    console.log('Perfrom Drag', e);
-  }
+    if (radius) {
+      const minLimit = min || 0;
+      const maxLimit = max || 100;
+      setPath(
+        getPath(radius)(359 * ((value - minLimit) / (maxLimit - minLimit)))
+      );
+    }
+  }, [radius, setPath, min, max, value]);
 
   return (
     <div
-      className='relative items-center justify-center inline-block text-center rounded-full cursor-pointer w-fit bg-[#111] opacity-50 hover:opacity-100'
-      // onWheel={captureWheel}
-      onDragEnter={performDrag}
-      onDrag={performDrag}
-      onDragExit={performDrag}
-      ref={knobDiv}
+      className={`relative flex items-center justify-center rounded-full cursor-pointer ${
+        touchStarted !== -1 ? 'z-40 shadow-lg right-16' : ''
+      }`}
+      ref={divRef}
     >
-      <svg
-        width={defaultOptions.radius * 2}
-        height={defaultOptions.radius * 2}
-        className='p-0 bg-transparent'
-      >
+      <div className='absolute w-full h-full rounded-full bg-[#111] z-0'></div>
+      <svg className='absolute z-10 w-full h-full p-0 bg-transparent rounded-full peer group'>
         <g>
           <path
-            className='fill-transparent stroke-red-400'
-            strokeWidth={defaultOptions.radius * 0.2}
-            d={redArcPathD}
-          />
-
-          <path
-            className='fill-transparent stroke-[#7EFF69]'
-            strokeWidth={defaultOptions.radius * 0.2}
-            d={greenArcPathD}
-          />
+            className='fill-transparent stroke-[#7EFF69] opacity-50 group-hover:opacity-100'
+            strokeWidth={`${(radius || 50) / 7.5}`}
+            d={path}
+          ></path>
         </g>
       </svg>
-      <div className='absolute top-0 left-0 flex items-center justify-center w-full h-full'>
-        <span className='text-xs font-bold text-center text-neutral-500'>
-          {value}
+
+      <div className='z-0 flex flex-col items-center w-full text-[0.5em] md:text-[0.75em] text-neutral-500 peer-hover:font-bold peer-hover:text-neutral-100'>
+        <span className='inline-block'>{value}</span>
+        <span className='text-[6px] md:text-[0.5em] leading-none indent-1 !font-normal !text-neutral-500 inline-block'>
+          /{max || 100}
         </span>
       </div>
     </div>
