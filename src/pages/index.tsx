@@ -1,11 +1,7 @@
 import { NextPage } from 'next';
 import { useEffect, useState } from 'react';
-import {
-  ProjectBar,
-  ProjectInfo,
-  TransportControls,
-} from '@/components/ProjectBar';
 import { Transport } from 'tone';
+import { ProjectBar } from '@/components/ProjectBar';
 import { ContextStarter } from '@/components/ContextStarter';
 import { SequenceEditor } from '@/components/SequenceEditor';
 import { useToneContext } from '@/components/context/tone';
@@ -17,13 +13,13 @@ import { KnobContainer, KnobGrid } from '@/components/KnobGrid';
 
 const IndexPage: NextPage = () => {
   const [probData, setProbData] = useState([
+    [0, 0, 0, 50, 75, 25, 0],
     [0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 50, 50, 0],
+    [80, 0, 0, 0, 20, 0, 0],
+    [0, 20, 30, 30, 80, 0, 0],
+    [100, 0, 0, 0, 0, 0, 0],
   ]);
 
   const [measureCount] = useState(4);
@@ -79,10 +75,7 @@ const IndexPage: NextPage = () => {
 
   return (
     <>
-      <ProjectBar>
-        <ProjectInfo />
-        <TransportControls />
-      </ProjectBar>
+      <ProjectBar />
 
       <ContextStarter />
       <AppTitle />
