@@ -1,8 +1,16 @@
+import { Scale } from 'tonal';
+
 export type RootNote = 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B';
 export const rootNotes: RootNote[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
 
-export type Mode = 'major' | 'minor';
-export const modes: Mode[] = ['major', 'minor'];
+export type Mode = 'major' | 'minor' | 'mixolydian' | 'lydian' | 'phrygian';
+export const modes: Mode[] = [
+  'major',
+  'minor',
+  'mixolydian',
+  'lydian',
+  'phrygian',
+];
 
 export interface KeySignature {
   root: RootNote;
@@ -125,4 +133,29 @@ export function getPath(radius: number) {
       [toRads(90), toRads(value)],
       0
     );
+}
+
+export function getNextNote(currentNote: number, probabilities: number[]) {
+  const sum = probabilities.reduce((agg, curr) => agg + curr, 0);
+  const randomValue = Math.floor(Math.random() * 100);
+
+  let tracker = 0;
+  for (let i = 0; i < probabilities.length; i++) {
+    const p = probabilities[i];
+    const rangeSize = (p / sum) * 100;
+
+    if (tracker < randomValue && randomValue < tracker + rangeSize) {
+      return i;
+    }
+
+    tracker += rangeSize;
+  }
+
+  return currentNote;
+}
+
+export function getScaleNotes(keySignature: KeySignature, octave = 4) {
+  return Scale.get([keySignature.root, keySignature.mode]).notes.map(
+    (note) => `${note}${octave}`
+  );
 }

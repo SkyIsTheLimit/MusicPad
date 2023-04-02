@@ -1,89 +1,99 @@
 import {
-  createContext,
   Dispatch,
+  createContext,
   HTMLAttributes,
-  SetStateAction,
   useContext,
   useEffect,
-  useState,
+  useReducer,
 } from 'react';
 import { Transport } from 'tone';
 import { useToneContext } from './tone';
 import { KeySignature, TimeSignature } from '../utils';
 
-export interface ProjectContext {
+export interface Project {
   name: string;
   tempo: number;
   keySignature: KeySignature;
   timeSignature: TimeSignature;
   sequencerPattern: string[];
+  data: number[][];
+  previousNote: number;
+  currentNote: number;
+  highlight: [number, number];
 }
 
 export interface ProjectContextApi {
-  setName: Dispatch<SetStateAction<string>>;
-  setTempo: Dispatch<SetStateAction<number>>;
-  setKeySignature: Dispatch<SetStateAction<KeySignature>>;
-  setTimeSignature: Dispatch<SetStateAction<TimeSignature>>;
-  setSequencerPattern: Dispatch<SetStateAction<string[]>>;
+  project: Project;
+  dispatch: Dispatch<{ type: string; data: Partial<Project> }>;
+  setProject(project: Partial<Project>): void;
 }
-
-const defaultCtx: ProjectContext & ProjectContextApi = {
+const defaultProject: Project = {
   name: 'Untitled Song',
-  tempo: 120,
+  tempo: 80,
   keySignature: {
     root: 'C',
     mode: 'major',
   },
   timeSignature: [4, 4],
-  sequencerPattern: ['x---', 'x---', 'x---', 'x---'],
-
-  setName: () => {},
-  setTempo: () => {},
-  setKeySignature: () => {},
-  setTimeSignature: () => {},
-  setSequencerPattern: () => {},
+  sequencerPattern: ['----', '----', '----', '----'],
+  data: [
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+  ],
+  previousNote: 0,
+  currentNote: 0,
+  highlight: [0, 0],
 };
 
-export const ProjectContext = createContext<ProjectContext & ProjectContextApi>(
-  defaultCtx
-);
+const defaultCtx: ProjectContextApi = {
+  project: defaultProject,
+
+  dispatch() {},
+  setProject() {},
+};
+
+function projectReducer(
+  state: Project,
+  action: { type: string; data: Partial<Project> }
+): Project {
+  switch (action.type) {
+    case 'project:update':
+    case 'project:tempo':
+    case 'project:keySignature':
+    case 'project:timeSignature':
+    case 'project:sequencePattern':
+    case 'project:data':
+    case 'project:currentNote':
+    case 'project:highlight':
+      return { ...state, ...action.data };
+
+    default:
+      return { ...state, ...action.data };
+  }
+}
+
+export const ProjectContext = createContext<ProjectContextApi>(defaultCtx);
 export function ProjectProvider({ children }: HTMLAttributes<HTMLElement>) {
-  const [name, setName] = useState(defaultCtx.name);
-  const [tempo, setTempo] = useState(defaultCtx.tempo);
-  const [keySignature, setKeySignature] = useState(defaultCtx.keySignature);
-  const [timeSignature, setTimeSignature] = useState(defaultCtx.timeSignature);
-  const [sequencerPattern, setSequencerPattern] = useState(
-    defaultCtx.sequencerPattern
-  );
-  const { setTempo: setTempoOnTone, setTimeSignature: setTimeSignatureOnTone } =
-    useToneContext();
+  const [project, dispatch] = useReducer(projectReducer, defaultProject);
 
-  useEffect(() => {
-    setTempo(Transport.bpm?.value);
-  }, []);
-
-  useEffect(() => {
-    setTempoOnTone(tempo);
-  }, [tempo, setTempoOnTone]);
-
-  useEffect(() => {
-    setTimeSignatureOnTone(timeSignature);
-  }, [timeSignature, setTimeSignatureOnTone]);
+  function setProject(project: Project) {
+    dispatch({
+      type: 'project:update',
+      data: { ...defaultProject, ...project },
+    });
+  }
 
   return (
     <ProjectContext.Provider
       value={{
-        name,
-        tempo,
-        keySignature,
-        timeSignature,
-        sequencerPattern,
-
-        setName,
-        setTempo,
-        setKeySignature,
-        setTimeSignature,
-        setSequencerPattern,
+        project: { ...defaultProject, ...project },
+        dispatch,
+        setProject,
       }}
     >
       {children}

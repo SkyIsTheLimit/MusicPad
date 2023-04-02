@@ -6,6 +6,8 @@ export interface KnobParams {
   max?: number;
   value: number;
   radius?: number;
+  onValueChanged?: (newValue: number) => void;
+  highlighted?: boolean;
 }
 
 export interface Touchable {
@@ -20,22 +22,31 @@ export function Knob({
   radius,
   showOverlay,
   hideOverlay,
+  onValueChanged,
+  highlighted,
 }: KnobParams & Touchable) {
   const divRef = useRef<HTMLDivElement>(null);
+  const shadowDiv = useRef<HTMLDivElement>(null);
   const [path, setPath] = useState('');
   const [value, setValue] = useState(value_ || 0);
   const [touchStarted, setTouchStarted] = useState(-1);
 
   useEffect(() => {
+    setValue(value_);
+  }, [value_]);
+
+  useEffect(() => {
     const divRefCopy = divRef;
     let maxSpeed = 1;
 
-    function updateKnobValue(newValue: number) {
+    function updateKnobValue(newValue: number, fireCallback = true) {
       const minLimit = min || 0;
       const maxLimit = max || 100;
 
       if (newValue >= minLimit && newValue <= maxLimit) {
         setValue(newValue);
+
+        if (onValueChanged && fireCallback) onValueChanged(newValue);
       }
     }
 
@@ -65,7 +76,7 @@ export function Knob({
       if (touchStarted !== -1) {
         const diff = touchStarted - e.changedTouches[0].clientY;
 
-        updateKnobValue(Math.round(value + diff));
+        updateKnobValue(Math.round(value + diff), false);
 
         setTouchStarted(e.changedTouches[0].clientY);
       }
@@ -73,6 +84,9 @@ export function Knob({
 
     function touchEnd(e: TouchEvent) {
       setTouchStarted(-1);
+
+      updateKnobValue(value);
+
       hideOverlay();
     }
 
@@ -94,7 +108,16 @@ export function Knob({
         divRefCopy.current.removeEventListener('touchend', touchEnd);
       }
     };
-  }, [divRef, min, max, value, showOverlay, hideOverlay, touchStarted]);
+  }, [
+    divRef,
+    min,
+    max,
+    value,
+    showOverlay,
+    hideOverlay,
+    touchStarted,
+    onValueChanged,
+  ]);
 
   useEffect(() => {
     if (radius) {
@@ -106,6 +129,14 @@ export function Knob({
     }
   }, [radius, setPath, min, max, value]);
 
+  useEffect(() => {
+    if (shadowDiv.current) {
+      shadowDiv.current.style.boxShadow = highlighted
+        ? `0 0 0.75em 1em #73FFFF`
+        : '';
+    }
+  }, [shadowDiv, highlighted]);
+
   return (
     <div
       className={`relative flex items-center justify-center rounded-full cursor-pointer ${
@@ -113,6 +144,10 @@ export function Knob({
       }`}
       ref={divRef}
     >
+      <div
+        ref={shadowDiv}
+        className='absolute w-[50%] h-[50%] left-1/2 top-1/2 -translate-x-[50%] -translate-y-[50%] z-0 bg-transparent rounded-full'
+      ></div>
       <div className='absolute w-full h-full rounded-full bg-[#111] z-0'></div>
       <svg className='absolute z-10 w-full h-full p-0 bg-transparent rounded-full peer group'>
         <g>

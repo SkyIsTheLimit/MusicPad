@@ -8,12 +8,14 @@ import {
 import { Knob } from './Knob';
 
 export interface KnobGridParams {
+  highlight: [number, number];
   values: number[][];
   rows: number;
   columns: number;
   gridTemplateAreas: string;
   horizontalLabels: ReactElement;
   verticalLabels: ReactElement;
+  onValueChanged?: (values: number[][]) => void;
 }
 
 export function KnobContainer({
@@ -24,6 +26,7 @@ export function KnobContainer({
 }
 
 export function KnobGrid({
+  highlight,
   values,
   rows,
   columns,
@@ -32,6 +35,7 @@ export function KnobGrid({
   horizontalLabels,
   verticalLabels,
   children,
+  onValueChanged,
 }: KnobGridParams & HTMLAttributes<HTMLDivElement>) {
   const divRef = useRef<HTMLDivElement>(null);
   const [computedKnobRadius, setComputedKnobRadius] = useState(40);
@@ -40,14 +44,26 @@ export function KnobGrid({
   const showOverlay = () => setOverlayVisible(true);
   const hideOverlay = () => setOverlayVisible(false);
 
-  const knobGrid = values.map((columns) =>
-    columns.map((column, index) => (
+  function valueChanged(row: number, column: number) {
+    return (value: number) => {
+      if (onValueChanged) {
+        const newValues = [...values];
+        newValues[row][column] = value;
+        onValueChanged(newValues);
+      }
+    };
+  }
+
+  const knobGrid = values.map((columns, row) =>
+    columns.map((value, column) => (
       <Knob
-        value={column}
-        key={index}
+        highlighted={row === highlight[0] && column === highlight[1]}
+        value={value}
+        key={column}
         radius={computedKnobRadius}
         showOverlay={showOverlay}
         hideOverlay={hideOverlay}
+        onValueChanged={valueChanged(row, column)}
       />
     ))
   );
@@ -77,7 +93,7 @@ export function KnobGrid({
       )}
       <div
         ref={divRef}
-        className={`grid gap-2 w-full h-full mr-8 mb-8 ${className || ''}`}
+        className={`grid gap-2 mr-8 mb-8 ${className || ''}`}
         style={{
           gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
           gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
@@ -85,6 +101,7 @@ export function KnobGrid({
         }}
       >
         {knobGrid}
+
         {horizontalLabels}
         {verticalLabels}
         {children}
